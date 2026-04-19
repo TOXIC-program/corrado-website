@@ -177,7 +177,7 @@ function NavBar() {
         <img
           src={vwLogoNav}
           alt="VW"
-          style={{ width: 38, height: 38, objectFit: "contain", filter: "drop-shadow(0 2px 8px rgba(0,30,80,0.25))" }}
+          style={{ width: 38, height: 38, objectFit: "cover", borderRadius: "50%", filter: "drop-shadow(0 2px 8px rgba(0,30,80,0.25))" }}
         />
         <span className="font-semibold text-sm tracking-widest uppercase" style={{ color: "#001e50", fontFamily: "'Epilogue', sans-serif", letterSpacing: "0.18em" }}>
           Corrado VR6
