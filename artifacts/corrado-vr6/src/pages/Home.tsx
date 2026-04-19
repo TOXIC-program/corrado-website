@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { useRef, useState, useCallback } from "react";
+import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
 import vwLogo from "@assets/vw_logo.png";
 import corradoFront from "@assets/corrado_front.png";
 import corradoRear from "@assets/corrado_rear.png";
@@ -48,6 +48,123 @@ const features = [
       "Ventilated disc brakes at all four corners gave the Corrado VR6 stopping power that matched its acceleration. The system was derived from Volkswagen's motorsport program, providing consistent, fade-resistant performance even during spirited driving.",
   },
 ];
+
+function TiltCard({
+  src,
+  alt,
+  testId,
+  glowColor = "rgba(27,92,229,0.25)",
+}: {
+  src: string;
+  alt: string;
+  testId: string;
+  glowColor?: string;
+}) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [hovered, setHovered] = useState(false);
+
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+  const glareX = useMotionValue(50);
+  const glareY = useMotionValue(50);
+
+  const rotateX = useSpring(rawX, { stiffness: 200, damping: 25 });
+  const rotateY = useSpring(rawY, { stiffness: 200, damping: 25 });
+  const scale = useSpring(hovered ? 1.03 : 1, { stiffness: 300, damping: 28 });
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!cardRef.current) return;
+      const rect = cardRef.current.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+      rawX.set((y - 0.5) * -14);
+      rawY.set((x - 0.5) * 14);
+      glareX.set(x * 100);
+      glareY.set(y * 100);
+    },
+    [rawX, rawY, glareX, glareY]
+  );
+
+  const handleMouseLeave = useCallback(() => {
+    setHovered(false);
+    rawX.set(0);
+    rawY.set(0);
+    glareX.set(50);
+    glareY.set(50);
+  }, [rawX, rawY, glareX, glareY]);
+
+  return (
+    <motion.div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateX,
+        rotateY,
+        scale,
+        transformStyle: "preserve-3d",
+        perspective: 1000,
+        cursor: "pointer",
+        borderRadius: 16,
+        position: "relative",
+      }}
+      className="w-full"
+    >
+      <div
+        className="absolute inset-0 rounded-2xl pointer-events-none z-20"
+        style={{
+          background: `radial-gradient(circle at ${glareX.get()}% ${glareY.get()}%, rgba(255,255,255,0.18) 0%, transparent 60%)`,
+          transition: "opacity 0.2s",
+          opacity: hovered ? 1 : 0,
+          borderRadius: 16,
+          mixBlendMode: "overlay",
+        }}
+      />
+
+      <div
+        className="absolute inset-0 pointer-events-none z-0"
+        style={{
+          borderRadius: 20,
+          boxShadow: hovered
+            ? `0 40px 100px ${glowColor}, 0 8px 32px rgba(0,0,0,0.18)`
+            : `0 20px 60px rgba(0,30,80,0.15)`,
+          transition: "box-shadow 0.4s ease",
+        }}
+      />
+
+      <motion.img
+        src={src}
+        alt={alt}
+        className="w-full rounded-2xl relative z-10 block"
+        style={{ objectFit: "cover", display: "block" }}
+        data-testid={testId}
+      />
+
+      {hovered && (
+        <div
+          className="absolute bottom-4 left-1/2 pointer-events-none z-30"
+          style={{
+            transform: "translateX(-50%) translateZ(20px)",
+            background: "rgba(0,30,80,0.7)",
+            color: "white",
+            fontFamily: "'Epilogue', sans-serif",
+            fontSize: 11,
+            letterSpacing: "0.15em",
+            textTransform: "uppercase",
+            padding: "6px 14px",
+            borderRadius: 100,
+            backdropFilter: "blur(8px)",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {alt}
+        </div>
+      )}
+    </motion.div>
+  );
+}
 
 function NavBar() {
   return (
@@ -108,11 +225,13 @@ function Layer1Logo() {
               filter: "blur(30px)",
             }}
           />
-          <img
+          <motion.img
             src={vwLogo}
             alt="Volkswagen Logo"
             className="relative z-10"
             style={{ width: 220, height: 220, objectFit: "contain", filter: "drop-shadow(0 20px 60px rgba(0,30,80,0.18))" }}
+            whileHover={{ scale: 1.08, rotate: 5, filter: "drop-shadow(0 30px 80px rgba(27,92,229,0.35))" }}
+            transition={{ type: "spring", stiffness: 260, damping: 20 }}
             data-testid="img-vw-logo"
           />
         </motion.div>
@@ -218,21 +337,12 @@ function Layer2Front() {
           </p>
         </div>
 
-        <motion.div style={{ y: imgY }} className="relative w-full max-w-4xl">
-          <div
-            className="absolute inset-0 rounded-3xl"
-            style={{
-              background: "radial-gradient(ellipse 100% 60% at 50% 80%, rgba(27,92,229,0.10) 0%, transparent 70%)",
-              filter: "blur(40px)",
-              transform: "translateY(20px) scaleX(0.9)",
-            }}
-          />
-          <img
+        <motion.div style={{ y: imgY, perspective: 1000 }} className="relative w-full max-w-4xl">
+          <TiltCard
             src={corradoFront}
-            alt="Corrado VR6 Front View"
-            className="w-full rounded-2xl relative z-10"
-            style={{ objectFit: "cover", filter: "drop-shadow(0 30px 80px rgba(0,30,80,0.20))" }}
-            data-testid="img-corrado-front"
+            alt="Corrado VR6 — Front View"
+            testId="img-corrado-front"
+            glowColor="rgba(27,92,229,0.3)"
           />
         </motion.div>
 
@@ -242,8 +352,8 @@ function Layer2Front() {
             style={{ color: "#111827", fontFamily: "'Inter', sans-serif", fontWeight: 300, lineHeight: 1.8 }}
             data-testid="text-front-description"
           >
-            From the front, the Corrado commands instant respect. Its low, wide stance and razor-sharp hood lines 
-            communicate intent before a single rev. The integrated front air dam and projector headlights frame 
+            From the front, the Corrado commands instant respect. Its low, wide stance and razor-sharp hood lines
+            communicate intent before a single rev. The integrated front air dam and projector headlights frame
             a face that remains unmistakably purposeful — a sports car born from one of Europe's great engineering houses.
           </p>
         </div>
@@ -255,9 +365,7 @@ function Layer2Front() {
 function Layer3Rear() {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const rotate = useTransform(scrollYProgress, [0, 0.5, 1], [5, 0, -5]);
   const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.92, 1, 1, 0.92]);
 
   return (
     <section
@@ -296,23 +404,14 @@ function Layer3Rear() {
           </p>
         </div>
 
-        <motion.div style={{ rotate, scale }} className="relative w-full max-w-4xl">
-          <div
-            className="absolute inset-0 rounded-3xl"
-            style={{
-              background: "radial-gradient(ellipse 100% 50% at 50% 100%, rgba(0,30,80,0.12) 0%, transparent 70%)",
-              filter: "blur(40px)",
-              transform: "translateY(30px)",
-            }}
-          />
-          <img
+        <div className="relative w-full max-w-4xl" style={{ perspective: 1000 }}>
+          <TiltCard
             src={corradoRear}
-            alt="Corrado VR6 Rear View"
-            className="w-full rounded-2xl relative z-10"
-            style={{ objectFit: "cover", filter: "drop-shadow(0 30px 80px rgba(0,30,80,0.22))" }}
-            data-testid="img-corrado-rear"
+            alt="Corrado VR6 — Rear View"
+            testId="img-corrado-rear"
+            glowColor="rgba(0,30,80,0.25)"
           />
-        </motion.div>
+        </div>
 
         <div className="w-full max-w-3xl mx-auto text-center">
           <p
@@ -320,9 +419,9 @@ function Layer3Rear() {
             style={{ color: "#111827", fontFamily: "'Inter', sans-serif", fontWeight: 300, lineHeight: 1.8 }}
             data-testid="text-rear-description"
           >
-            The rear of the Corrado tells the most dramatic story. At 45 mph, the electric spoiler emerges from its 
-            flush recess to deliver aerodynamic downforce — then retreats just as silently when speeds drop. 
-            The wide taillights sweep across the full width of the car, giving it a stance that looks 
+            The rear of the Corrado tells the most dramatic story. At 45 mph, the electric spoiler emerges from its
+            flush recess to deliver aerodynamic downforce — then retreats just as silently when speeds drop.
+            The wide taillights sweep across the full width of the car, giving it a stance that looks
             planted, purposeful, and unmistakably 1990s European sports car excellence.
           </p>
         </div>
@@ -367,24 +466,12 @@ function Layer4Top() {
           </p>
         </div>
 
-        <motion.div
-          style={{ y }}
-          className="relative w-full max-w-4xl"
-        >
-          <div
-            className="absolute inset-0"
-            style={{
-              background: "radial-gradient(ellipse 80% 80% at 50% 50%, rgba(27,92,229,0.08) 0%, transparent 70%)",
-              filter: "blur(50px)",
-              transform: "scale(1.2)",
-            }}
-          />
-          <img
+        <motion.div style={{ y, perspective: 1000 }} className="relative w-full max-w-4xl">
+          <TiltCard
             src={corradoTop}
-            alt="Corrado VR6 Top View"
-            className="w-full rounded-2xl relative z-10"
-            style={{ objectFit: "cover", filter: "drop-shadow(0 40px 80px rgba(0,30,80,0.20))" }}
-            data-testid="img-corrado-top"
+            alt="Corrado VR6 — Aerial View"
+            testId="img-corrado-top"
+            glowColor="rgba(0,176,240,0.25)"
           />
         </motion.div>
 
@@ -394,9 +481,9 @@ function Layer4Top() {
             style={{ color: "#111827", fontFamily: "'Inter', sans-serif", fontWeight: 300, lineHeight: 1.8 }}
             data-testid="text-top-description"
           >
-            From above, the Corrado reveals the true mastery of its form. The tapering roofline flows 
-            from the A-pillars in a single unbroken arc to the tail, giving it the profile of a stretched 
-            teardrop. Every surface serves the air. Every crease has purpose. Seen from the sky, 
+            From above, the Corrado reveals the true mastery of its form. The tapering roofline flows
+            from the A-pillars in a single unbroken arc to the tail, giving it the profile of a stretched
+            teardrop. Every surface serves the air. Every crease has purpose. Seen from the sky,
             you understand why journalists called it the most beautiful car Volkswagen ever built.
           </p>
         </div>
@@ -443,8 +530,9 @@ function SpecsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.07, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              whileHover={{ background: "rgba(255,255,255,0.10)" }}
               className="flex flex-col items-center justify-center py-10 px-6 text-center"
-              style={{ background: "rgba(255,255,255,0.04)", borderRight: "1px solid rgba(255,255,255,0.06)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+              style={{ background: "rgba(255,255,255,0.04)", borderRight: "1px solid rgba(255,255,255,0.06)", borderBottom: "1px solid rgba(255,255,255,0.06)", cursor: "default", transition: "background 0.2s" }}
               data-testid={`spec-card-${i}`}
             >
               <span
@@ -501,8 +589,9 @@ function FeaturesSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ delay: i * 0.1, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              whileHover={{ y: -6, boxShadow: "0 16px 48px rgba(0,30,80,0.14)" }}
               className="rounded-2xl p-8 flex flex-col gap-4"
-              style={{ background: "#ffffff", border: "1px solid rgba(0,30,80,0.08)", boxShadow: "0 4px 24px rgba(0,30,80,0.06)" }}
+              style={{ background: "#ffffff", border: "1px solid rgba(0,30,80,0.08)", boxShadow: "0 4px 24px rgba(0,30,80,0.06)", cursor: "default" }}
               data-testid={`feature-card-${i}`}
             >
               <div
@@ -573,10 +662,10 @@ function HeritageBanner() {
           style={{ color: "#374151", fontFamily: "'Inter', sans-serif", fontWeight: 300, lineHeight: 1.8 }}
           data-testid="text-heritage-body"
         >
-          The Volkswagen Corrado was Volkswagen's answer to a simple question: what happens when you 
-          take the world's most advanced four-cylinder platform and push it further than anyone thought 
-          possible? The result was a car that challenged Porsches, embarrassed hatchbacks, and 
-          redefined what a "hot Volkswagen" could mean. Produced in just 97,521 units, every Corrado 
+          The Volkswagen Corrado was Volkswagen's answer to a simple question: what happens when you
+          take the world's most advanced four-cylinder platform and push it further than anyone thought
+          possible? The result was a car that challenged Porsches, embarrassed hatchbacks, and
+          redefined what a "hot Volkswagen" could mean. Produced in just 97,521 units, every Corrado
           that survives today is a piece of automotive history.
         </motion.p>
       </div>
