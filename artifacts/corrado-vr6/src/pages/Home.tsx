@@ -518,7 +518,7 @@ function SpecsSection() {
             style={{ color: "#ffffff", fontFamily: "'Epilogue', sans-serif", letterSpacing: "-0.02em" }}
             data-testid="text-specs-title"
           >
-            THE NUMBERS
+            SPECS
           </h2>
         </div>
 
