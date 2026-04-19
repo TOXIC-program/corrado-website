@@ -1,0 +1,26 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "X-SHG72sb0xXVpC8CuU-i"
+uri = "file://attached_assets/vw_logo.png"
+type = "image"
+title = "VW logo badge"
+
+[[generated]]
+id = "-XjxWIyrgBBulXgoCGFnz"
+uri = "file://attached_assets/corrado_front.png"
+type = "image"
+title = "Corrado VR6 front view"
+
+[[generated]]
+id = "Ce7xLcWphiQrIldzi1HsC"
+uri = "file://attached_assets/corrado_rear.png"
+type = "image"
+title = "Corrado VR6 rear view"
+
+[[generated]]
+id = "r2PN0TJMKs8F-g-8kN0_o"
+uri = "file://attached_assets/corrado_top.png"
+type = "image"
+title = "Corrado VR6 top view"
