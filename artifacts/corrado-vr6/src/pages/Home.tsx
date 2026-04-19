@@ -1,6 +1,7 @@
 import { useRef, useState, useCallback } from "react";
 import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
 import vwLogo from "@assets/vw_logo.png";
+import vwLogoNav from "@assets/image_1776596917406.png";
 import corradoFront from "@assets/corrado_front.png";
 import corradoRear from "@assets/corrado_rear.png";
 import corradoTop from "@assets/corrado_top.png";
@@ -174,9 +175,9 @@ function NavBar() {
     >
       <div className="flex items-center gap-3">
         <img
-          src={vwLogo}
+          src={vwLogoNav}
           alt="VW"
-          style={{ width: 32, height: 32, objectFit: "contain", filter: "drop-shadow(0 2px 6px rgba(0,30,80,0.18))" }}
+          style={{ width: 38, height: 38, objectFit: "contain", filter: "drop-shadow(0 2px 8px rgba(0,30,80,0.25))" }}
         />
         <span className="font-semibold text-sm tracking-widest uppercase" style={{ color: "#001e50", fontFamily: "'Epilogue', sans-serif", letterSpacing: "0.18em" }}>
           Corrado VR6
