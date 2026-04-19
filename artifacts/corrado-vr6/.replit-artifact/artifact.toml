@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Volkswagen Corrado VR6"
+version = "1.0.0"
+id = "artifacts/corrado-vr6"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 26167
+
+[services.development]
+run = "pnpm --filter @workspace/corrado-vr6 run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/corrado-vr6", "run", "build" ]
+publicDir = "artifacts/corrado-vr6/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "26167"
+BASE_PATH = "/"
