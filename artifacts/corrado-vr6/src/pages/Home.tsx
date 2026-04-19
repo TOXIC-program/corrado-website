@@ -609,7 +609,7 @@ function Footer() {
           className="text-xs"
           style={{ color: "#001e50", fontFamily: "'Epilogue', sans-serif", opacity: 0.3, letterSpacing: "0.1em" }}
         >
-          Das Auto.
+          Patrick Abou Nasr
         </div>
       </div>
     </footer>
