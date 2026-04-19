@@ -8,9 +8,9 @@ import corradoTop from "@assets/corrado_top.png";
 const specs = [
   { label: "Engine", value: "2.8L VR6" },
   { label: "Power", value: "178 hp" },
-  { label: "Torque", value: "177 lb-ft" },
-  { label: "0–60 mph", value: "6.7 sec" },
-  { label: "Top Speed", value: "140 mph" },
+  { label: "Torque", value: "240 Nm" },
+  { label: "0–100 kph", value: "6.7 sec" },
+  { label: "Top Speed", value: "225 kph" },
   { label: "Cylinders", value: "6 in-line V" },
   { label: "Displacement", value: "2792 cc" },
   { label: "Years", value: "1991–1995" },
@@ -173,12 +173,11 @@ function NavBar() {
       style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(0,30,80,0.08)" }}
     >
       <div className="flex items-center gap-3">
-        <div
-          className="w-8 h-8 rounded-full flex items-center justify-center"
-          style={{ background: "#001e50" }}
-        >
-          <span className="text-white font-bold text-xs" style={{ fontFamily: "'Epilogue', sans-serif" }}>VW</span>
-        </div>
+        <img
+          src={vwLogo}
+          alt="VW"
+          style={{ width: 32, height: 32, objectFit: "contain", filter: "drop-shadow(0 2px 6px rgba(0,30,80,0.18))" }}
+        />
         <span className="font-semibold text-sm tracking-widest uppercase" style={{ color: "#001e50", fontFamily: "'Epilogue', sans-serif", letterSpacing: "0.18em" }}>
           Corrado VR6
         </span>
